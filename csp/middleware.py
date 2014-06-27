@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils.six.moves import http_client
 
-from csp.utils import build_policy
+from csp.utils import build_policy, build_nonce
 
 
 class CSPMiddleware(object):
@@ -13,7 +13,6 @@ class CSPMiddleware(object):
     See http://www.w3.org/TR/CSP/
 
     """
-
     def process_response(self, request, response):
         if getattr(response, '_csp_exempt', False):
             return response
@@ -32,12 +31,22 @@ class CSPMiddleware(object):
         if getattr(settings, 'CSP_REPORT_ONLY', False):
             header += '-Report-Only'
 
+        # build a nonce
+        nonce = build_nonce()
+        request.META["CSP_NONCE"] = nonce
+
         if header in response:
             # Don't overwrite existing headers.
             return response
 
+        # TODO: find nonce-configuration from config (have a none-directives
+        # list)
+
         config = getattr(response, '_csp_config', None)
-        update = getattr(response, '_csp_update', None)
+        update = getattr(response, '_csp_update', {})
+        # TODO: append 'update' entry for all applicable nonce-srces ...
+        # ... but for now hack something in
+        update['script-src'] = "'nonce-%s'"%(nonce)
         replace = getattr(response, '_csp_replace', None)
         response[header] = build_policy(config=config, update=update,
                                         replace=replace)

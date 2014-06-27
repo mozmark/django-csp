@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.crypto import get_random_string
 
 
 def from_settings():
@@ -16,6 +17,9 @@ def from_settings():
         'report-uri': getattr(settings, 'CSP_REPORT_URI', None),
     }
 
+def build_nonce():
+    # TODO: Actually build a nonce
+    return get_random_string(8)
 
 def build_policy(config=None, update=None, replace=None):
     """Builds the policy as a string from the settings."""
