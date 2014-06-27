@@ -3,8 +3,17 @@ from django.utils.six.moves import http_client
 
 from csp.utils import build_policy, build_nonce
 
+def get_nonce(request):
+    """
+    Gets the script nonce value for this request.
+    """
+    return request.META['CSP_NONCE']
 
 class CSPMiddleware(object):
+    def process_request(self, request):
+        # build a nonce
+        request.META['CSP_NONCE'] = build_nonce()
+
     """
     Implements the Content-Security-Policy response header, which
     conforming user-agents can use to restrict the permitted sources
@@ -31,22 +40,18 @@ class CSPMiddleware(object):
         if getattr(settings, 'CSP_REPORT_ONLY', False):
             header += '-Report-Only'
 
-        # build a nonce
-        nonce = build_nonce()
-        request.META["CSP_NONCE"] = nonce
-
         if header in response:
             # Don't overwrite existing headers.
             return response
 
-        # TODO: find nonce-configuration from config (have a none-directives
+        # TODO: find nonce-configuration from config (have a nonce-directives
         # list)
 
         config = getattr(response, '_csp_config', None)
         update = getattr(response, '_csp_update', {})
         # TODO: append 'update' entry for all applicable nonce-srces ...
         # ... but for now hack something in
-        update['script-src'] = "'nonce-%s'"%(nonce)
+        update['script-src'] = "'nonce-%s'"%(get_nonce(request))
         replace = getattr(response, '_csp_replace', None)
         response[header] = build_policy(config=config, update=update,
                                         replace=replace)
