@@ -51,7 +51,10 @@ These settings affect the policy in the header. The defaults are in
 ``CSP_REPORT_URI``
     Set the ``report-uri`` directive. A **string** with a full or
     relative URI.
-
+``CSP_NONCE_SOURCES``
+    Set which directives should have nonce-sources. A tuple or list. *None*
+``CSP_NONCE_LENGTH``
+    Set the length (chars) of the CSP nonce. An integer. *32*
 
 Changing the Policy
 -------------------
@@ -66,6 +69,12 @@ Other Settings
 These settings control the behavior of django-csp. Defaults are in
 *italics*.
 
+``TEMPLATE_CONTEXT_PROCESSORS``
+    You should ensure TEMPLATE_CONTEXT_PROCESSORS includes the csp context
+    processor so you can add nonce attributes to your script and style
+    elements.  Something like `TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + ("csp.context_processors.csp",)`
+    should do the trick. You can do someting like
+    `<script nonce="{{ csp_nonce }}">` for your elements.
 ``CSP_REPORT_ONLY``
     Send "report-only" headers instead of real headers. See the spec_
     and the chapter on `reports <reports-chapter>`_ for more info. A

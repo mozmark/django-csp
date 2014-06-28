@@ -44,14 +44,13 @@ class CSPMiddleware(object):
             # Don't overwrite existing headers.
             return response
 
-        # TODO: find nonce-configuration from config (have a nonce-directives
-        # list)
-
         config = getattr(response, '_csp_config', None)
         update = getattr(response, '_csp_update', {})
-        # TODO: append 'update' entry for all applicable nonce-srces ...
-        # ... but for now hack something in
-        update['script-src'] = "'nonce-%s'"%(get_nonce(request))
+
+        # Check which nonce-source directives to add
+        for nonce_directive in getattr(settings, 'CSP_NONCE_SOURCES',()):
+            update[nonce_directive] = "'nonce-%s'"%(get_nonce(request))
+
         replace = getattr(response, '_csp_replace', None)
         response[header] = build_policy(config=config, update=update,
                                         replace=replace)

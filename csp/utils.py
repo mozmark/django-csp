@@ -18,8 +18,8 @@ def from_settings():
     }
 
 def build_nonce():
-    # TODO: Actually build a nonce
-    return get_random_string(8)
+    nonce_length = getattr(settings,"CSP_NONCE_LENGTH", 32)
+    return get_random_string(nonce_length)
 
 def build_policy(config=None, update=None, replace=None):
     """Builds the policy as a string from the settings."""
