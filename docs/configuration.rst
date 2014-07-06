@@ -69,12 +69,6 @@ Other Settings
 These settings control the behavior of django-csp. Defaults are in
 *italics*.
 
-``TEMPLATE_CONTEXT_PROCESSORS``
-    You should ensure TEMPLATE_CONTEXT_PROCESSORS includes the csp context
-    processor so you can add nonce attributes to your script and style
-    elements.  Something like `TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + ("csp.context_processors.csp",)`
-    should do the trick. You can do someting like
-    `<script nonce="{{ csp_nonce }}">` for your elements.
 ``CSP_REPORT_ONLY``
     Send "report-only" headers instead of real headers. See the spec_
     and the chapter on `reports <reports-chapter>`_ for more info. A
