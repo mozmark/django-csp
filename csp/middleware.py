@@ -1,18 +1,12 @@
 from django.conf import settings
 from django.utils.six.moves import http_client
 
-from csp.utils import build_policy, build_nonce
-
-def get_nonce(request):
-    """
-    Gets the script nonce value for this request.
-    """
-    return request.META['CSP_NONCE']
+from csp.utils import build_policy, build_nonce, get_nonce
 
 class CSPMiddleware(object):
     def process_request(self, request):
         # build a nonce
-        request.META['CSP_NONCE'] = build_nonce()
+        request._csp_nonce = build_nonce()
 
     """
     Implements the Content-Security-Policy response header, which
