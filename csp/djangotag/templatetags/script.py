@@ -1,6 +1,6 @@
 from django import template
-import django
-import datetime
+from django.template.base import TextNode
+
 
 def do_script(parser, token):
     tag_name = None
@@ -11,7 +11,8 @@ def do_script(parser, token):
         tag_name = token.contents
     if arg:
         if not (arg[0] == arg[-1] and arg[0] in ('"', "'")):
-            raise template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name)
+            raise template.TemplateSyntaxError(
+                "%r tag's argument should be in quotes" % tag_name)
     else:
         arg = ''
 
@@ -19,6 +20,7 @@ def do_script(parser, token):
     parser.delete_first_token()
 
     return ScriptNode(arg[1:-1], nodelist)
+
 
 class ScriptNode(template.Node):
     def __init__(self, arg, nodelist):
@@ -28,11 +30,12 @@ class ScriptNode(template.Node):
     def render(self, context):
         comment = ''
         if not self.dangerous:
-            if len(self.nodelist) > 1\
-            or len(self.nodelist) > 0\
-            and type(self.nodelist[0]) != django.template.base.TextNode:
-                return '<!-- dangerous script clobbered by django-csp -->'
-        return comment+"<script nonce=\"%s\">"%(unicode(context['csp_nonce']))+self.nodelist.render(context)+'</script>'
+            if len(self.nodelist) > 1 or len(self.nodelist) > 0\
+                    and type(self.nodelist[0]) != TextNode:
+                        return '<!-- script clobbered by django-csp -->'
+        return comment\
+            + "<script nonce=\"%s\">" % (unicode(context['csp_nonce']))\
+            + self.nodelist.render(context) + '</script>'
 
 register = template.Library()
-register.tag('script',do_script)
+register.tag('script', do_script)

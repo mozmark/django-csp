@@ -14,7 +14,8 @@ class ScriptExtension(Extension):
 
         # TODO: Check we've an output node
         # if this is not 'unsafe' and we have dangerous children, bail out
-        if len(body[0].nodes) > 1 or type(body[0].nodes[0]) != nodes.TemplateData:
+        if len(body[0].nodes) > 1 or type(body[0].nodes[0])\
+                != nodes.TemplateData:
             raise Exception('{% script %} tag has an unsafe body')
 
         node = self.call_method('_render_script', [ctx_ref], lineno=lineno)
@@ -23,6 +24,7 @@ class ScriptExtension(Extension):
     def _render_script(self, context, caller):
         """Helper callback."""
         nonce = context['csp_nonce']
-        print 'nonce is',nonce
-        rv = Markup("<script nonce=\"%s\">" % (unicode(nonce))) + caller() + Markup("</script>")
+        print 'nonce is', nonce
+        rv = Markup("<script nonce=\"%s\">" % (unicode(nonce)))\
+            + caller() + Markup("</script>")
         return Markup(rv)
