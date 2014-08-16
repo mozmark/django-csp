@@ -3,6 +3,7 @@ from django.utils.six.moves import http_client
 
 from csp.utils import build_policy, build_nonce, get_nonce
 
+
 class CSPMiddleware(object):
     def process_request(self, request):
         # build a nonce
@@ -42,8 +43,8 @@ class CSPMiddleware(object):
         update = getattr(response, '_csp_update', {})
 
         # Check which nonce-source directives to add
-        for nonce_directive in getattr(settings, 'CSP_NONCE_SOURCES',()):
-            update[nonce_directive] = "'nonce-%s'"%(get_nonce(request))
+        for nonce_directive in getattr(settings, 'CSP_NONCE_SOURCES', ()):
+            update[nonce_directive] = "'nonce-%s'" % (get_nonce(request))
 
         replace = getattr(response, '_csp_replace', None)
         response[header] = build_policy(config=config, update=update,

@@ -17,15 +17,18 @@ def from_settings():
         'report-uri': getattr(settings, 'CSP_REPORT_URI', None),
     }
 
+
 def build_nonce():
-    nonce_length = getattr(settings,"CSP_NONCE_LENGTH", 32)
+    nonce_length = getattr(settings, "CSP_NONCE_LENGTH", 32)
     return get_random_string(nonce_length)
+
 
 def get_nonce(request):
     """
     Gets the script nonce value for this request.
     """
     return request._csp_nonce
+
 
 def build_policy(config=None, update=None, replace=None):
     """Builds the policy as a string from the settings."""
